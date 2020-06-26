@@ -114,7 +114,7 @@ class push {
                 SELECT LAST_INSERT_ID();
                 INSERT INTO oc_category_description SET category_id = @lastID, language_id = '1', name = '$arr', description = '', meta_title = '', meta_h1 = '', meta_description = '', meta_keyword = '';
                 INSERT INTO oc_category_description SET category_id = @lastID, language_id = '3', name = '$arr', description = '', meta_title = '', meta_h1 = '', meta_description = '', meta_keyword = '';
-                INSERT INTO `oc_category_path` SET `category_id` = @lastID, `path_id` = '2', `level` = '0';
+                INSERT INTO `oc_category_path` SET `category_id` = @lastID, `path_id` = @lastID, `level` = '0';
                 INSERT INTO oc_category_to_store SET category_id = @lastID, store_id = '0';
                 INSERT INTO oc_category_to_layout SET category_id = @lastID, store_id = '0', layout_id = '0';
                 SELECT `category_id` FROM `oc_category` WHERE `category_id` = @lastID;
@@ -149,7 +149,7 @@ class push {
                 SELECT LAST_INSERT_ID();
                 INSERT INTO oc_category_description SET category_id = @lastID, language_id = '1', name = '$cat', description = '', meta_title = '', meta_h1 = '', meta_description = '', meta_keyword = '';
                 INSERT INTO oc_category_description SET category_id = @lastID, language_id = '3', name = '$cat', description = '', meta_title = '', meta_h1 = '', meta_description = '', meta_keyword = '';
-                INSERT INTO `oc_category_path` SET `category_id` = @lastID, `path_id` = '2', `level` = '0';
+                INSERT INTO `oc_category_path` SET `category_id` = @lastID, `path_id` = @lastID, `level` = '0';
                 INSERT INTO oc_category_to_store SET category_id = @lastID, store_id = '0';
                 INSERT INTO oc_category_to_layout SET category_id = @lastID, store_id = '0', layout_id = '0';
                 SELECT `category_id` FROM `oc_category` WHERE `category_id` = @lastID;
@@ -165,6 +165,35 @@ class push {
             return $cat;
         }
 
+    }
+    function atr_group() {
+        global $oc; /* Пока не научился */
+        $result = $oc->sql($q  = "
+            SELECT `name` FROM `oc_attribute_group_description` WHERE `name` = 'Характеристики';
+        ");
+        $check = $result[0]['name'];
+        if(empty($check)) {
+            $result = $oc->sql($q  = "
+                INSERT INTO oc_attribute_group SET sort_order = '1';
+                SET @lastID := LAST_INSERT_ID();
+                INSERT INTO oc_attribute_group_description SET attribute_group_id = @lastID, language_id = '1', name = 'Характеристики';
+                INSERT INTO oc_attribute_group_description SET attribute_group_id = @lastID, language_id = '3', name = 'Характеристики';
+            ");
+        } 
+    }
+
+    function atr_add($val) {
+        global $oc; /* Пока не научился */
+        $result = $oc->sql($q  = "
+            SELECT `attribute_group_id` FROM `oc_attribute_group_description` WHERE `name` = 'Характеристики';
+        ");
+        $check = $result[0]['attribute_group_id'];
+        $result = $oc->sql($q  = "
+            INSERT INTO oc_attribute SET attribute_group_id = '$check', sort_order = '0';
+            SET @lastID := LAST_INSERT_ID();
+            INSERT INTO oc_attribute_description SET attribute_id = @lastID, language_id = '1', name = '$val';
+            INSERT INTO oc_attribute_description SET attribute_id = @lastID, language_id = '3', name = '$val';
+        ");
     }
 }
 ?>

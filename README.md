@@ -97,3 +97,21 @@
 </tr>
 </tbody>
 </table>
+
+<b>✅ Import/atr.php</b> - перенос названия атрибутов в базу данных OpenCart. Испольюзуются функции:
+<table>
+<tbody>
+<tr>
+<td>⚫ Push/atr_group</td>
+<td>⏩ Создает главную группу (Характеристики)</td>
+</tr>
+<tr>
+<td>⚫ Get/atr</td>
+<td>⏪ Получаем список уникальных атрибутов</td>
+</tr>
+<tr>
+<td>⚫ Push/atr_add</td>
+<td>⏩ Сохранение названий атрибутов в базе OpenCart</td>
+</tr>
+</tbody>
+</table>

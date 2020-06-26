@@ -48,7 +48,6 @@ class get {
         return round($datediff / (60 * 60 * 24));
        
     }
-<<<<<<< HEAD
     function images_ind() {
         global $data; /* Пока не научился */
         $result = $data->sql($q  = "
@@ -89,7 +88,19 @@ class get {
         ");
         return $result[0]['category_id'];
     }
-=======
->>>>>>> parent of f3e3979... Сохрание изображений
+    function products() {
+        global $data; /* Пока не научился */
+        $result = $data->sql($q  = "
+            SELECT * FROM `products`;
+        ");
+        return $result;
+    }
+    function atr() {
+        global $data; /* Пока не научился */
+        $result = $data->sql($q  = "
+            SELECT DISTINCT `attribute` FROM `attributes`;
+        ");
+        return $result;
+    }
 }
 ?>
