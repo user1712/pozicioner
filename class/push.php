@@ -7,6 +7,7 @@ $oc = new oc();
 use DiDom\Document;
 /* Класс для записи данных в базу */
 class push {
+    
     function addcatalog($arr) {
         global $data; /* Пока не научился */
         $cat1 = $arr[1]->text();
@@ -136,12 +137,12 @@ class push {
         $created = date("Y-m-d H:i:s");
         $cat = $arr['cat'];
         $par = $arr['parent'];
-        $tra = translit($arr);
+        $tra = translit($cat);
         $result = $oc->sql($q  = "
             SELECT `name` FROM `oc_category_description` WHERE `name` = '$cat';
         ");
         $check = $result[0]['name'];
-        if($check == $arr) {} 
+        if($check == $cat) {} 
         else {
             $result = $oc->sql($q  = "
                 INSERT INTO oc_category SET parent_id = '$par', `top` = '1', `column` = '2', sort_order = '0', status = '1', noindex = '1', date_modified = '$created', date_added = '$created', image = '';
@@ -193,6 +194,43 @@ class push {
             SET @lastID := LAST_INSERT_ID();
             INSERT INTO oc_attribute_description SET attribute_id = @lastID, language_id = '1', name = '$val';
             INSERT INTO oc_attribute_description SET attribute_id = @lastID, language_id = '3', name = '$val';
+        ");
+    }
+
+    function add_brend($val) {
+        global $oc; /* Пока не научился */
+        $result = $oc->sql($q  = "
+            SELECT `name` FROM `oc_manufacturer`  WHERE `name` = '$val';
+        ");
+        $check = $result[0]['name'];
+        if($check !== $val) {
+            $result = $oc->sql($q  = "
+                INSERT INTO oc_manufacturer SET name = '$val', sort_order = '0', noindex = '0';
+                SET @lastID := LAST_INSERT_ID();
+                INSERT INTO oc_manufacturer_to_layout SET manufacturer_id = @lastID, store_id = '0', layout_id = '0';
+                UPDATE oc_manufacturer SET image = '' WHERE manufacturer_id = @lastID;
+                INSERT INTO oc_manufacturer_description SET manufacturer_id = @lastID, language_id = '1', description = '', description3 = '', meta_title = '', meta_h1 = '', meta_description = '', meta_keyword = '';
+                INSERT INTO oc_manufacturer_description SET manufacturer_id = @lastID, language_id = '3', description = '', description3 = '', meta_title = '', meta_h1 = '', meta_description = '', meta_keyword = '';
+                INSERT INTO oc_manufacturer_to_store SET manufacturer_id = @lastID, store_id = '0';
+            ");
+            $result = $oc->sql($q  = "
+                SELECT `manufacturer_id` FROM `oc_manufacturer`  WHERE `name` = '$val';
+            ");
+            $id = $result[0]['manufacturer_id'];
+            $tra = translit($val);
+            $result = $oc->sql($q  = "
+                INSERT INTO oc_seo_url SET store_id = '0', language_id = '1', query = 'manufacturer_id=1', keyword = 'ru_$tra';
+                INSERT INTO oc_seo_url SET store_id = '0', language_id = '3', query = 'manufacturer_id=1', keyword = 'ua_$tra'
+            ");
+            echo $tra;
+        }
+    }
+
+    function add_product($val) {
+        global $oc; /* Пока не научился */
+        echo $val['name'];
+        $result = $oc->sql($q  = "
+            INSERT INTO oc_product SET model = '7785', sku = '', upc = '', ean = '', jan = '', isbn = '', mpn = '', location = 'г. Киев', quantity = '100', minimum = '1', subtract = '1', stock_status_id = '7', date_available = '2020-06-27', manufacturer_id = '0', shipping = '1', price = '250', points = '0', weight = '0', weight_class_id = '1', length = '0', width = '0', height = '0', length_class_id = '1', status = '1', noindex = '1', tax_class_id = '0', sort_order = '1', date_added = NOW(), date_modified = NOW()
         ");
     }
 }

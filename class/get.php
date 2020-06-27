@@ -88,6 +88,7 @@ class get {
         ");
         return $result[0]['category_id'];
     }
+
     function products() {
         global $data; /* Пока не научился */
         $result = $data->sql($q  = "
@@ -95,10 +96,19 @@ class get {
         ");
         return $result;
     }
+
     function atr() {
         global $data; /* Пока не научился */
         $result = $data->sql($q  = "
             SELECT DISTINCT `attribute` FROM `attributes`;
+        ");
+        return $result;
+    }
+
+    function brend() {
+        global $data; /* Пока не научился */
+        $result = $data->sql($q  = "
+            SELECT DISTINCT `brand` FROM `products`;
         ");
         return $result;
     }
