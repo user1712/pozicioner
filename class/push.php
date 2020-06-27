@@ -2,8 +2,8 @@
 require ''.$_SERVER['DOCUMENT_ROOT'].'/pozicioner/vendor/autoload.php';  
 require ''.$_SERVER['DOCUMENT_ROOT'].'/pozicioner/db.php';  
 require ''.$_SERVER['DOCUMENT_ROOT'].'/pozicioner/class/translit.php';  
-$data = new base();
 $oc = new oc();
+$data = new base();
 use DiDom\Document;
 /* Класс для записи данных в базу */
 class push {
@@ -18,6 +18,7 @@ class push {
             INSERT INTO `category` (`catalog1`, `catalog2`, `catalog3`, `created`, `link`) VALUES ('$cat1', '$cat2', 0, '$created', '$link');
         ");
     }
+
     function product_url($url) {
         global $data; /* Пока не научился */
         $cat = $GLOBALS["cat"]; /* имя категории */
@@ -26,6 +27,7 @@ class push {
             INSERT INTO `product_url` (`url`, `category`, `stat`, `created`) VALUES ('$url', '$cat', 0, '$created');
         ");
     }
+
     function product_data($url) {
         global $data; /* Пока не научился */
         $url2 = $url->url;
@@ -82,6 +84,7 @@ class push {
             INSERT INTO `products` (`name`, `brand`, `category`, `description`, `price`, `img`, `stock`, `img_ind`, `id_url`, `update`) VALUES ('$product_name', '$product_brand', '$catalog', '$product_text', '$product_price', '$images', '$product_stock', '$product_index_img', '$url_id', '$created');
         ");
     }
+
     function product_stock($id) {
         global $data; /* Пока не научился */
         $link = $id->url;
@@ -132,6 +135,7 @@ class push {
         }
 
     }
+
     function add_cat2($arr) {
         global $oc; /* Пока не научился */
         $created = date("Y-m-d H:i:s");
@@ -167,6 +171,7 @@ class push {
         }
 
     }
+
     function atr_group() {
         global $oc; /* Пока не научился */
         $result = $oc->sql($q  = "
@@ -228,10 +233,107 @@ class push {
 
     function add_product($val) {
         global $oc; /* Пока не научился */
-        echo $val['name'];
+        $name =  $val['name'];
+        $model =  $val['id'];
+        if( $val['stock'] == 'В наличии') {
+            $stock = 100;
+        } else {
+            $stock = 0;
+        }
+        $brend =  $val['brand'];
         $result = $oc->sql($q  = "
-            INSERT INTO oc_product SET model = '7785', sku = '', upc = '', ean = '', jan = '', isbn = '', mpn = '', location = 'г. Киев', quantity = '100', minimum = '1', subtract = '1', stock_status_id = '7', date_available = '2020-06-27', manufacturer_id = '0', shipping = '1', price = '250', points = '0', weight = '0', weight_class_id = '1', length = '0', width = '0', height = '0', length_class_id = '1', status = '1', noindex = '1', tax_class_id = '0', sort_order = '1', date_added = NOW(), date_modified = NOW()
+            SELECT `manufacturer_id` FROM `oc_manufacturer`  WHERE `name` = '$brend';
+        ");
+        $manufacturer_id = $result[0]['manufacturer_id'];
+        echo $manufacturer_id;
+        $img_ind =  $val['img_ind'];
+        $temp = array_reverse(explode('/', $img_ind));
+        $img_ind = $temp[0];
+        $description = htmlspecialchars($val['description'], ENT_QUOTES);
+
+        $temp =  $val['category'];
+        $result = $oc->sql($q  = "
+            SELECT `category_id` FROM `oc_category_description`  WHERE `name` = '$temp';
+        ");
+        $category_id = $result[0]['category_id'];
+        $price =  $val['price'];
+
+        $result = $oc->sql($q  = "
+            INSERT INTO oc_product SET model = '$model', sku = '', upc = '', ean = '', jan = '', isbn = '', mpn = '', location = 'г. Киев', quantity = $stock, minimum = '1', subtract = '1', stock_status_id = '7', date_available = '2020-06-27', manufacturer_id = '$manufacturer_id', shipping = '1', price = '$price', points = '0', weight = '0', weight_class_id = '1', length = '0', width = '0', height = '0', length_class_id = '1', status = '1', noindex = '1', tax_class_id = '0', sort_order = '1', date_added = NOW(), date_modified = NOW(), cost = '0.0000';
+            SET @lastID := LAST_INSERT_ID();
+            UPDATE oc_product SET image = 'catalog/products/$img_ind' WHERE product_id = @lastID;
+            INSERT INTO oc_product_description SET product_id = @lastID, language_id = '1', name = '$name', description = '$description', tag = '', meta_title = '', meta_h1 = '', meta_description = '', meta_keyword = '';
+            UPDATE oc_product SET image = 'catalog/products/$img_ind' WHERE product_id = @lastID;
+            INSERT INTO oc_product_description SET product_id = @lastID, language_id = '3', name = '$name', description = '$description', tag = '', meta_title = '', meta_h1 = '', meta_description = '', meta_keyword = '';
+            INSERT INTO oc_product_to_store SET product_id = @lastID, store_id = '0';
+            INSERT INTO oc_product_to_category SET product_id = @lastID, category_id = '$category_id';
+            UPDATE oc_product_to_category SET main_category = 1 WHERE product_id = @lastID AND category_id = '$category_id';
+        ");
+        $result = $oc->sql($q  = "
+            SELECT `product_id` FROM `oc_product_description`  WHERE `name` = '$name';
+        ");
+        $temp = $result[0]['product_id'];
+        $tra = translit($name);
+        $result = $oc->sql($q  = "
+            INSERT INTO oc_seo_url SET store_id = '0', language_id = '1', query = 'product_id=$temp', keyword = 'ru_$tra';
+            INSERT INTO oc_seo_url SET store_id = '0', language_id = '3', query = 'product_id=$temp', keyword = 'ua_$tra';
+            INSERT INTO oc_product_to_layout SET product_id = '$temp', store_id = '0', layout_id = '0';
         ");
     }
+
+    function add_proatr($val) {
+        global $data; 
+        global $oc; 
+        $temp =  $val['id_url'];
+        $product = $val['name']; 
+        $result = $data->sql($q  = "
+            SELECT * FROM `attributes` WHERE `url_id` = '$temp';
+        ");
+        foreach($result as $val) {
+            $name = $val['attribute']; 
+            $value = $val['value']; 
+            $result = $oc->sql($q  = "
+                SELECT `attribute_id` FROM `oc_attribute_description` WHERE `name` = '$name';
+            ");
+            $attribute_id = $result[0]['attribute_id'];
+
+            $result = $oc->sql($q  = "
+                SELECT `product_id` FROM `oc_product_description` WHERE `name` = '$product';
+            ");
+            $product_id = $result[0]['product_id'];
+            $result = $oc->sql($q  = "
+                DELETE FROM oc_product_attribute WHERE product_id = '$product_id' AND attribute_id = '$attribute_id';
+                DELETE FROM oc_product_attribute WHERE product_id = '$product_id' AND attribute_id = '$attribute_id' AND language_id = '1';
+                INSERT INTO oc_product_attribute SET product_id = '$product_id', attribute_id = '$attribute_id', language_id = '1', text = '$value';
+                DELETE FROM oc_product_attribute WHERE product_id = '$product_id' AND attribute_id = '$attribute_id' AND language_id = '3';
+                INSERT INTO oc_product_attribute SET product_id = '$product_id', attribute_id = '$attribute_id', language_id = '3', text = '$value';
+            ");
+
+        }
+       
+    }
+
+    function add_images($val) {
+        global $oc; 
+        global $data; 
+        
+        $temp =  $val['img'];
+        $arr = explode('@', $temp);
+        $temp =  $val['name'];
+        $result = $oc->sql($q  = "
+            SELECT `product_id` FROM `oc_product_description` WHERE `name` = '$temp';
+        ");
+        $product_id = $result[0]['product_id'];
+        foreach($arr as $val) {
+            if(!empty($val)) {
+                $temp = array_reverse(explode('/', $val));
+                $img = $temp[0];
+                $result = $oc->sql($q  = "
+                    INSERT INTO oc_product_image SET product_id = '$product_id', image = 'catalog/products/$img', sort_order = '0';
+                ");
+            } 
+        }
+    }
+    
 }
 ?>

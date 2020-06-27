@@ -115,3 +115,39 @@
 </tr>
 </tbody>
 </table>
+
+<b>✅ Import/brend.php</b> - перенос производителей в базу данных OpenCart. Испольюзуются функции:
+<table>
+<tbody>
+<tr>
+<td>⚫ Push/add_brend</td>
+<td>⏩ Записываем в базу данных OpenCart</td>
+</tr>
+<tr>
+<td>⚫ Get/brend</td>
+<td>⏪ Получаем список производителей</td>
+</tr>
+</tbody>
+</table>
+
+<b>✅ Import/products.php</b> - перенос товара в базу данных OpenCart. Испольюзуются функции:
+<table>
+<tbody>
+<tr>
+<td>⚫ Get/products</td>
+<td>⏪ Получаем данные о товарах</td>
+</tr>
+<tr>
+<td>⚫ Push/add_product</td>
+<td>⏩ Записываем данные о товаре в базу данных OpenCart</td>
+</tr>
+<tr>
+<td>⚫ Push/add_proatr</td>
+<td>⏩ Записываем атрибуты в базу данных OpenCart</td>
+</tr>
+<tr>
+<td>⚫ Push/add_images</td>
+<td>⏩ Добавляем изображения в OpenCart</td>
+</tr>
+</tbody>
+</table>

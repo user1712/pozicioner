@@ -7,9 +7,12 @@
     $multi_curl = new MultiCurl();
     $push = new push();
     $get = new get();
-    
-    foreach($get->products() as $data) {
-        $push->add_product($data);
+    $arr = $get->products();
+    shuffle($arr);
+    foreach($arr as $datas) {
+        $push->add_product($datas);
+        $push->add_proatr($datas);
+        $push->add_images($datas);
     break;
     }
   
