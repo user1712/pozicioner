@@ -10,10 +10,10 @@
     $arr = $get->products();
     shuffle($arr);
     foreach($arr as $datas) {
-        $push->add_product($datas);
-        $push->add_proatr($datas);
-        $push->add_images($datas);
-    break;
+        if($push->add_product($datas) == true) {
+            $push->add_proatr($datas);
+            $push->add_images($datas);
+        }
     }
   
     

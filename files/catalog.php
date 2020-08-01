@@ -1,22 +1,31 @@
 <?php
+    require ''.$_SERVER['DOCUMENT_ROOT'].'/pozicioner/proxy.php';
     require ''.$_SERVER['DOCUMENT_ROOT'].'/pozicioner/vendor/autoload.php';  
     require ''.$_SERVER['DOCUMENT_ROOT'].'/pozicioner/class/push.php';  
     use Curl\MultiCurl;
+    use Curl\Curl;
     use DiDom\Document;
     $multi_curl = new MultiCurl();
+    $multi_curl->setProxy($proxy_ip, $proxy_port, $proxy_login, $proxy_pass);
+    $multi_curl->setProxyTunnel();
     $push = new push();
-/* В данном блоке все названия и ссылки категорий (подкатегорий) */
+
+    $curl = new Curl();
+    $curl->setProxy($proxy_ip, $proxy_port, $proxy_login, $proxy_pass);
+    $curl->setProxyTunnel();
+    $curl->get('https://vapelife.com.ua/');
+    $html = $curl->response;
+   
 $multi_curl->success(function($instance) {
     global $push;
-    /* Далее проверяем кажду категорию на вложенность */
     $arr = $instance->response;
     $document = new Document($arr);
-    /* Собираем хлебные крошки */
     $page = $document->find('.breadcrumb a'); 
     $push->addcatalog($page);
 });
-/* Собираем все  */
-$document = new Document('https://vapelife.com.ua/', true);
+
+$document = new Document($html);
+
 $links = $document->find('#menu-v a'); 
 foreach($links as $val) {
     /* Добавляем каждую ссылку в мультипоток */

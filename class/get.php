@@ -26,14 +26,14 @@ class get {
         $result = $data->sql($q  = "
             SELECT `id_url` FROM `products` WHERE `id_url` = '$id_product';
         ");
-        return $result[0][0];
+        return $result[0]['id_url'];
     }
     function url_id($url) {
         global $data; /* Пока не научился */
         $result = $data->sql($q  = "
             SELECT `id` FROM `product_url` WHERE `url` = '$url';
         ");
-        return $result[0][0];
+        return $result[0]['id'];
     }
     function day($id) {
         global $data; /* Пока не научился */

@@ -2,9 +2,12 @@
     require ''.$_SERVER['DOCUMENT_ROOT'].'/pozicioner/vendor/autoload.php';  
     require ''.$_SERVER['DOCUMENT_ROOT'].'/pozicioner/class/push.php';  
     require ''.$_SERVER['DOCUMENT_ROOT'].'/pozicioner/class/get.php'; 
+    require ''.$_SERVER['DOCUMENT_ROOT'].'/pozicioner/proxy.php';
     use Curl\MultiCurl;
     use DiDom\Document;
     $multi_curl = new MultiCurl();
+    $multi_curl->setProxy($proxy_ip, $proxy_port, $proxy_login, $proxy_pass);
+    $multi_curl->setProxyTunnel();
     $push = new push();
     $get = new get();
     
@@ -15,7 +18,8 @@
         $page = $document->find('.card-body a'); 
       
         foreach($page as $val) {
-            $push->product_url($as = $val->href);
+            echo $push->product_url($as = $val->href);
+
         }
     });
     $i = array_reverse(range(1,3));
